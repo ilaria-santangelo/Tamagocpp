@@ -16,9 +16,9 @@ public:
     void play();
     void sleep();
     void status();
-    void teach(const string& trick);
-    void perform(const string& trick);
-   
+    void teach(const std::string& trick);
+    void perform(const std::string& trick);
+
 private:
     string name;
     string type;
@@ -27,8 +27,7 @@ private:
     int tiredness;
     bool isAlive;
     thread petThread;
-    unordered_set<string> tricks; 
+    std::unordered_set<std::string> tricks;
 
     void checkIsAlive();
 };
-

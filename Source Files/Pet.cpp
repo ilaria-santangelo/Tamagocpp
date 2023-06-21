@@ -76,4 +76,20 @@ void Pet::checkIsAlive() {
     }
 }
 
+// Pet.cpp
+void Pet::teach(const std::string& trick) {
+    tricks.insert(trick);
+    std::cout << name << " has learned to " << trick << "!" << std::endl;
+}
 
+void Pet::perform(const std::string& trick) {
+    if (tricks.count(trick) > 0) {
+        std::cout << name << " is performing " << trick << "!" << std::endl;
+        happiness += 5; // Performing a trick increases happiness
+        tiredness += 10; // but also makes the pet more tired
+        if (happiness > 100) happiness = 100;
+        if (tiredness > 100) tiredness = 100;
+    } else {
+        std::cout << name << " doesn't know how to " << trick << "!" << std::endl;
+    }
+}

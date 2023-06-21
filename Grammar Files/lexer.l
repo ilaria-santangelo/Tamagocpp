@@ -11,12 +11,13 @@ extern int yylex();
 
 %%
 
-
 "adopt" { return ADOPT; }
 "feed"  { return FEED; }
 "play" { return PLAY; }
 "sleep" { return SLEEP; }
 "status" { return STATUS; }
+"teach" { return TEACH; }  // New command
+"perform" { return PERFORM; }  // New command
 "dog"   { yylval.str = strdup("dog"); return IDENTIFIER; }
 "cat"   { yylval.str = strdup("cat"); return IDENTIFIER; }
 [a-zA-Z][a-zA-Z0-9]* { yylval.str = strdup(yytext); return IDENTIFIER; }

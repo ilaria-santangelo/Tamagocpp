@@ -3,8 +3,8 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
-#include "Pet.h"
-#include "SymbolTable.h"
+#include "../Header Files/Pet.h"
+#include "../Header Files/SymbolTable.h"
 void yyerror(const char *s);
 extern FILE *yyin;
 extern int yylex();
@@ -15,7 +15,7 @@ SymbolTable petMap;
   char* str;
 }
 
-%token ADOPT FEED PLAY SLEEP STATUS
+%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM
 %token <str> IDENTIFIER
 
 %%
@@ -32,6 +32,8 @@ command: adopt { /* do nothing */ }
        | play { /* do nothing */ }
        | sleep { /* do nothing */ }
        | status { /* do nothing */ }
+       | teach { /* do nothing */ }
+       | perform { /* do nothing */ }
        ;
 
 adopt: ADOPT IDENTIFIER IDENTIFIER {
@@ -82,6 +84,28 @@ status: STATUS IDENTIFIER {
          }
          delete $2;
       }
+
+
+teach: TEACH IDENTIFIER IDENTIFIER {
+         Pet* pet = petMap.lookup(std::string($2));
+         if (pet == nullptr) {
+           yyerror("Pet does not exist");
+         } else {
+           pet->teach(std::string($3));
+         }
+         delete $2; delete $3;
+      }
+
+perform: PERFORM IDENTIFIER IDENTIFIER {
+         Pet* pet = petMap.lookup(std::string($2));
+         if (pet == nullptr) {
+           yyerror("Pet does not exist");
+         } else {
+           pet->perform(std::string($3));
+         }
+         delete $2; delete $3;
+      }
+
 
 %%
 
