@@ -1,0 +1,4 @@
+*.flex.cpp
+*.tab.cpp
+*.tab.h
+**/cmake-build-debug
