@@ -6,7 +6,17 @@
 #include <thread>
 #include <mutex>
 
+#include <map>
+
+
 using namespace std;
+
+
+struct Item {
+    string type;  // toy, treat, accessory
+    int effect;   // effect on pet attributes
+
+};
 
 class Pet {
 private:
@@ -24,6 +34,8 @@ private:
     int level;
 
     unordered_set<string> tricks;
+    std::map<string, Item> inventory;
+
 
 public:
     Pet();
@@ -56,6 +68,10 @@ public:
     double getTirednessRate() const;
     double getExperienceRate() const;
     void calculateLevel();
+
+    void addItemToInventory(const string& item_name, const Item& item);
+    void useItemFromInventory(const string& item_name);
+
 };
 
 #endif

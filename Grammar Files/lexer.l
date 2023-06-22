@@ -19,15 +19,12 @@ extern int yylex();
 "feed"  { return FEED; }
 "play" { return PLAY; }
 "sleep" { return SLEEP; }
+"gift" { return GIFT; }
+"use"  { return USE; }
 "status" { return STATUS; }
 "teach" { return TEACH; }
 "perform" { return PERFORM; }
 "bury" { return BURY; }
-"loop" { return LOOP; }
-"(" { return '('; }
-")" { return ')'; }
-"," { return ','; }
-"\"" { return '"'; }
 "number" { return NUMBER; }
 [0-9]+ { yylval.num = atoi(yytext); return INTEGER; }
 "=" { return '='; }

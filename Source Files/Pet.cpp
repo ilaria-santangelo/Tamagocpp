@@ -59,7 +59,7 @@ void Pet::stop() {
 void Pet::feed(int amount) {
 
     lock_guard<mutex> lock(petMutex);
-    cout << "FED " << amount;
+    cout << "Fed " << amount << "\n";
     if (alive) {
         hunger -= amount * getHungerRate();
         if (hunger < 0) {
@@ -134,6 +134,14 @@ void Pet::status() {
         cout << "Name: " << name << ", Type: " << type << ", Hunger: " << hunger << ", Happiness: " << happiness
              << ", Tiredness: " << tiredness << ", Level: " << level << ", Experience: " << experience << endl;
 
+        if (!inventory.empty()) {
+            cout << "Inventory: " << endl;
+            for (const auto& item : inventory) {
+                cout << "- Name: " << item.first << ", Type: " << item.second.type << ", Effect: " << item.second.effect << endl;
+            }
+        } else {
+            cout << "Inventory is empty." << endl;
+        }
         if(type =="cat"){
             if(happiness >30){
                 draw_happy_cat();
@@ -286,3 +294,29 @@ bool Pet::isAlive() const {
     return alive;
 }
 
+void Pet::addItemToInventory(const string& item_name, const Item& item) {
+    inventory[item_name] = item;
+    cout << name << " has received a new " << item.type << ": " << item_name << "!" << endl;
+
+}
+
+
+void Pet::useItemFromInventory(const string& item_name) {
+    if (inventory.count(item_name) > 0) {
+        Item item = inventory[item_name];
+        if (item.type == "toy") {
+            happiness += item.effect;
+            tiredness += item.effect / 2;
+            hunger += item.effect / 2;
+        } else if (item.type == "treat") {
+            happiness += item.effect;
+            hunger -= item.effect;
+        } else if (item.type == "accessory") {
+            happiness += item.effect;
+        }
+        cout << name << " has used the " << item.type << ": " << item_name << "!" << endl;
+        inventory.erase(item_name);  // remove item from inventory after use
+    } else {
+        cout << name << " doesn't have a " << item_name << " in their inventory." << endl;
+    }
+}
