@@ -2,4 +2,5 @@
 *.tab.cpp
 *.tab.h
 **/cmake-build-debug
+**/cmake-build-debug-visual-studio
 **/.idea
