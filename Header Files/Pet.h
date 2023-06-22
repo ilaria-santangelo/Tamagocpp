@@ -13,7 +13,7 @@ public:
     Pet(string name, string type);
     ~Pet();
 
-    void feed();
+    void feed(int amount);
     void play();
     void sleep();
     void status();

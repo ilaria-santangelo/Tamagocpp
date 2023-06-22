@@ -21,6 +21,9 @@ extern int yylex();
 "teach" { return TEACH; }
 "perform" { return PERFORM; }
 "bury" { return BURY; }
+"number" { return NUMBER; }
+[0-9]+ { yylval.num = atoi(yytext); return INTEGER; }
+"=" { return '='; }
 "dog"   { yylval.str = strdup("dog"); return IDENTIFIER; }
 "cat"   { yylval.str = strdup("cat"); return IDENTIFIER; }
 [a-zA-Z][a-zA-Z0-9]* { yylval.str = strdup(yytext); return IDENTIFIER; }

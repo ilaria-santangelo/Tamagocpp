@@ -106,3 +106,23 @@ SymbolTable::~SymbolTable() {
     }
 }
 
+void SymbolTable::insertVariable(std::string name, int value) {
+    VariableTableEntry* newEntry = new VariableTableEntry;
+    newEntry->name = name;
+    newEntry->value = value;
+    newEntry->next = varHead;
+    varHead = newEntry;
+}
+
+int *SymbolTable::lookupVariable(std::string name) {
+    VariableTableEntry* entry = varHead;
+    while (entry != nullptr) {
+        if (entry->name == name) {
+            return &(entry->value);
+        }
+        entry = entry->next;
+    }
+    return nullptr;
+}
+
+

@@ -9,14 +9,19 @@ void yyerror(const char *s);
 extern FILE *yyin;
 extern int yylex();
 SymbolTable petMap;
+
+char* draw_dog();
+char* draw_cat();
 %}
 
 %union {
-  char* str;
+    char* str;
+    int num;
 }
 
-%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM BURY SAVE LOAD
+%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM BURY SAVE LOAD NUMBER
 %token <str> IDENTIFIER
+%token <num> INTEGER
 
 %%
 
@@ -37,7 +42,18 @@ command: adopt { }
        | save {}
        | load {}
        | bury {}
+       | declaration {}
        ;
+
+declaration: NUMBER IDENTIFIER '=' INTEGER {
+    int* existingVar = petMap.lookupVariable(std::string($2));
+    if (existingVar != nullptr) {
+        yyerror("Variable with this name already exists");
+    } else {
+        petMap.insertVariable(std::string($2), $4);
+    }
+    delete $2;
+}
 
 adopt: ADOPT IDENTIFIER IDENTIFIER {
           Pet* newPet = new Pet(std::string($2), std::string($3));
@@ -45,19 +61,39 @@ adopt: ADOPT IDENTIFIER IDENTIFIER {
             yyerror("Pet with this name already exists");
           } else {
             petMap.insert(std::string($3), newPet);
+            if (std::string($2) == "dog") {
+              std::cout << draw_dog();
+            }
+            else if (std::string($2) == "cat") {
+              std::cout << draw_cat();
+            }
           }
           delete $2; delete $3;
        }
 
-feed: FEED IDENTIFIER {
-         Pet* pet = petMap.lookup(std::string($2));
-         if (pet == nullptr) {
-           yyerror("Pet does not exist");
-         } else {
-           pet->feed();
-         }
-         delete $2;
-      }
+feed: FEED IDENTIFIER INTEGER {
+	    Pet* pet = petMap.lookup(std::string($2));
+	    if (pet == nullptr) {
+		yyerror("Pet does not exist");
+	    } else {
+		pet->feed($3);
+	    }
+	    delete $2;
+	}
+	| FEED IDENTIFIER IDENTIFIER {
+	    Pet* pet = petMap.lookup(std::string($2));
+	    int* value = petMap.lookupVariable(std::string($3));
+	    if (pet == nullptr) {
+		yyerror("Pet does not exist");
+	    } else if (value == nullptr) {
+		yyerror("Variable does not exist");
+	    } else {
+		pet->feed(*value);
+	    }
+	    delete $2; delete $3;
+	}
+;
+
 play: PLAY IDENTIFIER {
          Pet* pet = petMap.lookup(std::string($2));
          if (pet == nullptr) {
@@ -77,7 +113,6 @@ sleep: SLEEP IDENTIFIER {
          }
          delete $2;
       }
-
 status: STATUS IDENTIFIER {
          Pet* pet = petMap.lookup(std::string($2));
          if (pet == nullptr) {
@@ -151,4 +186,12 @@ int parser_main(int argc, char **argv) {
       }
       yyparse();
       return 0;
+}
+
+char* draw_dog() {
+return "\t————\n\tU・ᴥ・U\n     \\_( u   u)\n";
+}
+
+char* draw_cat() {
+    return "  /\\____/\\\n( = ・ᴥ・ =)\n (“) (“) _/\n";
 }

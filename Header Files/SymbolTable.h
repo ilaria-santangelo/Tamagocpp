@@ -12,9 +12,16 @@ struct SymbolTableEntry {
     SymbolTableEntry* next;
 };
 
+struct VariableTableEntry {
+    std::string name;
+    int value;
+    VariableTableEntry* next;
+};
+
 class SymbolTable {
 private:
     SymbolTableEntry* head;
+    VariableTableEntry* varHead = nullptr;
 
 public:
     SymbolTable();
@@ -24,6 +31,8 @@ public:
     void load(const std::string& filename);
     void clear();
     void bury(std::string name);
+    void insertVariable(std::string name, int value);
+    int* lookupVariable(std::string name);
     ~SymbolTable();
 };
 
