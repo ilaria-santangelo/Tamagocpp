@@ -224,7 +224,8 @@ void Pet::calculateLevel() {
 
 std::string Pet::saveState() const {
     return name + "," + type + "," + std::to_string(hunger) + "," +
-           std::to_string(happiness) + "," + std::to_string(tiredness) + "\n";
+           std::to_string(happiness) + "," + std::to_string(tiredness) +
+           std::to_string(level) + "," + std::to_string(experience) + "\n";
 }
 
 void Pet::loadState(const string& state) {
@@ -236,6 +237,8 @@ void Pet::loadState(const string& state) {
     if (getline(iss, token, ',')) hunger = stoi(token);
     if (getline(iss, token, ',')) happiness = stoi(token);
     if (getline(iss, token, ',')) tiredness = stoi(token);
+    if (getline(iss, token, ',')) level = stoi(token);
+    if (getline(iss, token, ',')) experience = stoi(token);
 }
 
 double Pet::getHungerRate() const {
