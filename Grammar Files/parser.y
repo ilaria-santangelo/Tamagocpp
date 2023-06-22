@@ -9,7 +9,12 @@ void yyerror(const char *s);
 extern FILE *yyin;
 extern int yylex();
 SymbolTable petMap;
+
+char* draw_dog();
+char* draw_cat();
 %}
+
+
 
 %union {
   char* str;
@@ -45,6 +50,12 @@ adopt: ADOPT IDENTIFIER IDENTIFIER {
             yyerror("Pet with this name already exists");
           } else {
             petMap.insert(std::string($3), newPet);
+            if (std::string($2) == "dog") {
+              std::cout << draw_dog();
+            }
+            else if (std::string($2) == "cat") {
+              std::cout << draw_cat();
+            }
           }
           delete $2; delete $3;
        }
@@ -77,7 +88,6 @@ sleep: SLEEP IDENTIFIER {
          }
          delete $2;
       }
-
 status: STATUS IDENTIFIER {
          Pet* pet = petMap.lookup(std::string($2));
          if (pet == nullptr) {
@@ -151,4 +161,12 @@ int parser_main(int argc, char **argv) {
       }
       yyparse();
       return 0;
+}
+
+char* draw_dog() {
+return "\t————\n\tU・ᴥ・U\n     \\_( u   u)\n";
+}
+
+char* draw_cat() {
+    return "  /\\____/\\\n( = ・ᴥ・ =)\n (“) (“) _/\n";
 }

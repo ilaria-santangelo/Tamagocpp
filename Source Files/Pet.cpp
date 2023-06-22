@@ -25,6 +25,32 @@ Pet::~Pet() {
     }
 }
 
+void draw_happy_cat(){
+    cout<<( "  /\\____/\\\n( =^ . ^ =)\n (“) (“) _/\n");
+}
+
+void draw_happy_dog(){
+    cout<<( "\t————\n\tU^ᴥ^U\n     \\_( u   u)\n");
+
+}
+
+void draw_sad_cat(){
+    cout<<( "  /\\____/\\\n( =- . - =)\n (“) (“) _/\n");
+}
+
+void draw_sad_dog(){
+    cout<<( "\t————\n\tU -ᴥ-U\n     \\_( u   u)\n");
+
+}
+
+void draw_dead_cat(){
+    cout<<( "  /\\____/\\\n( =x . x =)\n (“) (“) _/\n");
+}
+
+void draw_dead_dog(){
+    cout<<( "\t————\n\tU xᴥxU\n     \\_( u   u)\n");
+
+}
 void Pet::stop() {
     stopThread = true;
 }
@@ -97,7 +123,23 @@ void Pet::status() {
     if (alive) {
         cout << "Name: " << name << ", Type: " << type << ", Hunger: " << hunger << ", Happiness: " << happiness
              << ", Tiredness: " << tiredness << endl;
+
+        if(type =="cat"){
+            if(happiness >30){
+                draw_happy_cat();
+            }else{
+                draw_sad_cat();
+            }
+        }
+        else if(type == "dog"){
+            if(happiness>30){
+                draw_happy_dog();
+            }else{
+                draw_sad_dog();
+            }
+        }
     }
+
     else {
         cout << name << " is dead. Bury them.\n";
     }
@@ -128,12 +170,22 @@ void Pet::checkIsAlive() {
     if (hunger > 50) {
         cout << "Pet " << name << " has died of hunger." << endl;
         alive = false;
+        if(type == "cat"){
+            draw_dead_cat();
+        }else if(type == "dog"){
+            draw_dead_dog();
+        }
         stop();
         return;
     }
     if (tiredness > 100) {
         cout << "Pet " << name << " has died of tiredness." << endl;
         alive = false;
+        if(type == "cat"){
+            draw_dead_cat();
+        }else if(type == "dog"){
+            draw_dead_dog();
+        }
         stop();
         return;
     }
@@ -206,5 +258,4 @@ void Pet::setTricks(const unordered_set<std::string> &tricks) {
 bool Pet::isAlive() const {
     return alive;
 }
-
 
