@@ -167,8 +167,8 @@ void Pet::startPetThread() {
                 if (counter % 10 == 0) {
                     hunger += getHungerRate();
                     tiredness += getTirednessRate();
-                    happiness -= (hunger / BASE_HUNGER_RATE)/10;
-                    happiness -= (tiredness / BASE_TIREDNESS_RATE)/10;
+                    happiness -= (hunger / BASE_HUNGER_RATE);
+                    happiness -= (tiredness / BASE_TIREDNESS_RATE);
                     checkIsAlive();
                 }
             }

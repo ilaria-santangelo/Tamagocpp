@@ -254,9 +254,9 @@ bury: BURY IDENTIFIER {
           delete $2;
       }
 
-loop: LOOP '(' INTEGER ',' '"' command_string '"' ')' {
+loop: LOOP '(' INTEGER ',' command_string ')' {
      int loopCount = $3;
-     string commandStr = $6;
+     string commandStr = $5;
      for(int i = 0; i < loopCount; i++) {
          executeCommand(commandStr);
      }
