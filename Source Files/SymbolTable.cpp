@@ -29,7 +29,7 @@ void SymbolTable::save() {
         SymbolTableEntry* entry = head;
         while (entry != nullptr) {
             file << entry->name << "\n";
-            file << entry->pet->saveState() << "\n";
+            file << entry->pet->saveState();
             entry = entry->next;
         }
         file.close();

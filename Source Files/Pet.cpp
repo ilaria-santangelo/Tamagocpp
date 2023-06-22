@@ -2,18 +2,18 @@
 #include <iostream>
 #include <chrono>
 #include <sstream>
-
-#include "../Header Files/Pet.h"
-#include <iostream>
-#include <chrono>
-#include <sstream>
 #include <atomic>
 
-Pet::Pet() : name(""), type(""), hunger(0), happiness(0), tiredness(0), alive(true), stopThread(false) {
+#define BASE_HUNGER_RATE 10 // base hunger rate
+#define BASE_TIREDNESS_RATE 20 // base tiredness rate
+#define BASE_EXPERIENCE_RATE 10 // base experience rate
+#define LEVEL_UP_THRESHOLD 100 // experience points needed to level up
+
+Pet::Pet() : name(""), type(""), hunger(0), happiness(0), tiredness(0), alive(true), stopThread(false), experience(0), level(1) {
     startPetThread();
 }
 
-Pet::Pet(string _type, string _name) : name(_name), type(_type), hunger(0), happiness(10), tiredness(0), alive(true), stopThread(false) {
+Pet::Pet(string _type, string _name) : name(_name), type(_type), hunger(0), happiness(10), tiredness(0), alive(true), stopThread(false), experience(0), level(1) {
     startPetThread();
 }
 
@@ -55,19 +55,22 @@ void Pet::stop() {
     stopThread = true;
 }
 
+
 void Pet::feed(int amount) {
 
     lock_guard<mutex> lock(petMutex);
     cout << "FED " << amount;
     if (alive) {
-        hunger -= amount;
+        hunger -= amount * getHungerRate();
         if (hunger < 0) {
             hunger = 0;
         }
-        happiness += 2;
+        happiness += 2 * getExperienceRate();
         if (happiness > 100) {
             happiness = 100;
         }
+        experience += BASE_EXPERIENCE_RATE * getExperienceRate();
+        calculateLevel();
     }
     else {
         cout << name << " is dead.";
@@ -77,16 +80,19 @@ void Pet::feed(int amount) {
 void Pet::play() {
     lock_guard<mutex> lock(petMutex);
     if (alive) {
-        happiness += 5;
-        tiredness += 10;
+        happiness += 5 * getExperienceRate();
+        tiredness += 10 * getTirednessRate();
         if (happiness > 100) {
             happiness = 100;
         }
+        experience += BASE_EXPERIENCE_RATE * getExperienceRate();
+        calculateLevel();
     }
     else {
         cout << name << " is dead.";
     }
 }
+
 
 void Pet::sleep() {
     lock_guard<mutex> lock(petMutex);
@@ -111,10 +117,12 @@ void Pet::perform(const string& trick) {
     lock_guard<mutex> lock(petMutex);
     if (tricks.count(trick) > 0) {
         cout << name << " is performing " << trick << "!" << endl;
-        happiness += 5;
-        tiredness += 10;
+        happiness += 5 * getExperienceRate();
+        tiredness += 10 * getTirednessRate();
         if (happiness > 100) happiness = 100;
         if (tiredness > 100) tiredness = 100;
+        experience += BASE_EXPERIENCE_RATE * getExperienceRate();
+        calculateLevel();
     } else {
         cout << name << " doesn't know how to " << trick << "!" << endl;
     }
@@ -124,7 +132,7 @@ void Pet::status() {
     lock_guard<mutex> lock(petMutex);
     if (alive) {
         cout << "Name: " << name << ", Type: " << type << ", Hunger: " << hunger << ", Happiness: " << happiness
-             << ", Tiredness: " << tiredness << endl;
+             << ", Tiredness: " << tiredness << ", Level: " << level << ", Experience: " << experience << endl;
 
         if(type =="cat"){
             if(happiness >30){
@@ -147,6 +155,7 @@ void Pet::status() {
     }
 }
 
+
 void Pet::startPetThread() {
     petThread = thread([this]() {
         int counter = 0;
@@ -156,10 +165,12 @@ void Pet::startPetThread() {
                 lock_guard<mutex> lock(petMutex);
                 counter++;
                 if (counter % 10 == 0) {
-                    hunger++;
-                    tiredness++;
+                    hunger += getHungerRate();
+                    tiredness += getTirednessRate();
+                    happiness -= (hunger / BASE_HUNGER_RATE)/10;
+                    happiness -= (tiredness / BASE_TIREDNESS_RATE)/10;
+                    checkIsAlive();
                 }
-                checkIsAlive();
             }
         }
     });
@@ -191,6 +202,24 @@ void Pet::checkIsAlive() {
         stop();
         return;
     }
+    if (happiness < 0) {
+        cout << "Pet " << name << " has died of sadness." << endl;
+        alive = false;
+        if(type == "cat"){
+            draw_dead_cat();
+        }else if(type == "dog"){
+            draw_dead_dog();
+        }
+        stop();
+        return;
+    }
+}
+
+void Pet::calculateLevel() {
+    if (experience >= LEVEL_UP_THRESHOLD * level) {
+        level++;
+        cout << "Pet " << name << " has leveled up to Level " << level << "!" << endl;
+    }
 }
 
 std::string Pet::saveState() const {
@@ -209,44 +238,37 @@ void Pet::loadState(const string& state) {
     if (getline(iss, token, ',')) tiredness = stoi(token);
 }
 
-const string &Pet::getName() const {
-    return name;
+double Pet::getHungerRate() const {
+    return BASE_HUNGER_RATE / static_cast<double>(level);
 }
 
-void Pet::setName(const string &name) {
-    Pet::name = name;
+double Pet::getTirednessRate() const {
+    return BASE_TIREDNESS_RATE / static_cast<double>(level);
+}
+
+double Pet::getExperienceRate() const {
+    return BASE_EXPERIENCE_RATE / static_cast<double>(level);
+}
+
+const string &Pet::getName() const {
+    return name;
 }
 
 const string &Pet::getType() const {
     return type;
 }
 
-void Pet::setType(const string &type) {
-    Pet::type = type;
-}
-
 int Pet::getHunger() const {
     return hunger;
-}
-
-void Pet::setHunger(int hunger) {
-    Pet::hunger = hunger;
 }
 
 int Pet::getHappiness() const {
     return happiness;
 }
 
-void Pet::setHappiness(int happiness) {
-    Pet::happiness = happiness;
-}
 
 int Pet::getTiredness() const {
     return tiredness;
-}
-
-void Pet::setTiredness(int tiredness) {
-    Pet::tiredness = tiredness;
 }
 
 const unordered_set<std::string> &Pet::getTricks() const {

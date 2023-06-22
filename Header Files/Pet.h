@@ -1,53 +1,14 @@
-#pragma once
+#ifndef PET_H
+#define PET_H
 
 #include <string>
-#include <thread>
 #include <unordered_set>
+#include <thread>
 #include <mutex>
 
 using namespace std;
 
 class Pet {
-public:
-    Pet();
-    Pet(string name, string type);
-    ~Pet();
-
-    void feed(int amount);
-    void play();
-    void sleep();
-    void status();
-    void teach(const std::string& trick);
-    void perform(const std::string& trick);
-    string saveState() const;
-    void loadState(const string& state);
-
-    const string &getName() const;
-
-    void setName(const string &name);
-
-    const string &getType() const;
-
-    void setType(const string &type);
-
-    int getHunger() const;
-
-    void setHunger(int hunger);
-
-    int getHappiness() const;
-
-    void setHappiness(int happiness);
-
-    int getTiredness() const;
-
-    void setTiredness(int tiredness);
-
-    const unordered_set<std::string> &getTricks() const;
-
-    void setTricks(const unordered_set<std::string> &tricks);
-
-    bool isAlive() const;
-
 private:
     string name;
     string type;
@@ -55,13 +16,46 @@ private:
     int happiness;
     int tiredness;
     bool alive;
+    bool stopThread;
     thread petThread;
-    unordered_set<std::string> tricks;
     mutex petMutex;
-    atomic<bool> stopThread;
+
+    int experience;
+    int level;
+
+    unordered_set<string> tricks;
+
+public:
+    Pet();
+    Pet(string _type, string _name);
+    ~Pet();
+
+    void feed(int amount);
+    void play();
+    void sleep();
+    void teach(const string& trick);
+    void perform(const string& trick);
+    void status();
+    void stop();
 
     void startPetThread();
     void checkIsAlive();
+    string saveState() const;
+    void loadState(const string& state);
 
-    void stop();
+    const string &getName() const;
+    const string &getType() const;
+    int getHunger() const;
+    int getHappiness() const;
+    int getTiredness() const;
+    const unordered_set<std::string> &getTricks() const;
+    void setTricks(const unordered_set<std::string> &tricks);
+    bool isAlive() const;
+
+    double getHungerRate() const;
+    double getTirednessRate() const;
+    double getExperienceRate() const;
+    void calculateLevel();
 };
+
+#endif

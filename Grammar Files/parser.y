@@ -12,6 +12,101 @@ SymbolTable petMap;
 
 char* draw_dog();
 char* draw_cat();
+
+void executeCommand(string commandStr) {
+    vector<string> commandParts = splitString(commandStr, ' ');  // split commandStr by space
+
+    if (commandParts[0] == "adopt") {
+        Pet* newPet = new Pet(commandParts[1], commandParts[2]);
+        if (petMap.lookup(commandParts[2]) != nullptr) {
+            yyerror("Pet with this name already exists");
+        } else {
+            petMap.insert(commandParts[2], newPet);
+        }
+    }
+    else if (commandParts[0] == "feed") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            int amount = parseValue(commandParts[2]);  // this function should convert commandParts[2] to an integer (if it's a number) or fetch the variable value (if it's a variable name)
+            pet->feed(amount);
+        }
+    }
+    else if (commandParts[0] == "play") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            pet->play();
+        }
+    }
+    else if (commandParts[0] == "sleep") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            pet->sleep();
+        }
+    }
+    else if (commandParts[0] == "status") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            pet->status();
+        }
+    }
+    else if (commandParts[0] == "teach") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            pet->teach(commandParts[2]);
+        }
+    }
+    else if (commandParts[0] == "perform") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            pet->perform(commandParts[2]);
+        }
+    }
+    else if (commandParts[0] == "bury") {
+        Pet* pet = petMap.lookup(commandParts[1]);
+        if (pet == nullptr) {
+            yyerror("Pet does not exist");
+        } else {
+            if (pet->isAlive() == false) {
+                petMap.bury(commandParts[1]);
+            } else {
+                std::cout << "Pet " << commandParts[1] << " is still alive. Can't bury it." << std::endl;
+            }
+        }
+    }
+    else {
+        yyerror("Invalid command");
+    }
+}
+
+int parseValue(string str) {
+    // if str is a number, convert it to integer and return
+    if (isdigit(str[0])) {
+        return atoi(str.c_str());
+    }
+    // if str is a variable name, look it up in the variable map and return its value
+    else {
+        int* value = varMap.lookup(str);
+        if (value == nullptr) {
+            yyerror("Variable does not exist");
+            return 0;
+        }
+        return *value;
+    }
+}
+
+
 %}
 
 %union {
@@ -43,6 +138,7 @@ command: adopt { }
        | load {}
        | bury {}
        | declaration {}
+       | loop {}
        ;
 
 declaration: NUMBER IDENTIFIER '=' INTEGER {
@@ -157,6 +253,31 @@ bury: BURY IDENTIFIER {
           }
           delete $2;
       }
+
+loop: LOOP '(' INTEGER ',' '"' command_string '"' ')' {
+     int loopCount = $3;
+     string commandStr = $6;
+     for(int i = 0; i < loopCount; i++) {
+         executeCommand(commandStr);
+     }
+}
+
+command_string: IDENTIFIER {
+                    $$ = $1;
+                }
+              | IDENTIFIER IDENTIFIER {
+                    $$ = (std::string($1) + " " + std::string($2)).c_str();
+                    delete $1; delete $2;
+                }
+              | IDENTIFIER IDENTIFIER INTEGER {
+                    $$ = (std::string($1) + " " + std::string($2) + " " + std::to_string($3)).c_str();
+                    delete $1; delete $2;
+                }
+              | IDENTIFIER IDENTIFIER IDENTIFIER {
+                    $$ = (std::string($1) + " " + std::string($2) + " " + std::string($3)).c_str();
+                    delete $1; delete $2; delete $3;
+                }
+     ;
 
 save: SAVE {
     petMap.save();
