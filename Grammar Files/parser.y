@@ -114,8 +114,8 @@ int parseValue(string str) {
     int num;
 }
 
-%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM BURY SAVE LOAD NUMBER
-%token <str> IDENTIFIER
+%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM BURY SAVE LOAD NUMBER LOOP
+%token <str> IDENTIFIER command_string
 %token <num> INTEGER
 
 %%
@@ -263,21 +263,21 @@ loop: LOOP '(' INTEGER ',' command_string ')' {
 }
 
 command_string: IDENTIFIER {
-                    $$ = $1;
-                }
-              | IDENTIFIER IDENTIFIER {
-                    $$ = (std::string($1) + " " + std::string($2)).c_str();
-                    delete $1; delete $2;
-                }
-              | IDENTIFIER IDENTIFIER INTEGER {
-                    $$ = (std::string($1) + " " + std::string($2) + " " + std::to_string($3)).c_str();
-                    delete $1; delete $2;
-                }
-              | IDENTIFIER IDENTIFIER IDENTIFIER {
-                    $$ = (std::string($1) + " " + std::string($2) + " " + std::string($3)).c_str();
-                    delete $1; delete $2; delete $3;
-                }
-     ;
+	    $$ = $1;
+	}
+	| IDENTIFIER IDENTIFIER {
+	    $$ = strdup((std::string($1) + " " + std::string($2)).c_str());
+	    free($1); free($2);
+	}
+	| IDENTIFIER IDENTIFIER INTEGER {
+	    $$ = strdup((std::string($1) + " " + std::string($2) + " " + std::to_string($3)).c_str());
+	    free($1); free($2);
+	}
+	| IDENTIFIER IDENTIFIER IDENTIFIER {
+	    $$ = strdup((std::string($1) + " " + std::string($2) + " " + std::string($3)).c_str());
+	    free($1); free($2); free($3);
+	}
+
 
 save: SAVE {
     petMap.save();
