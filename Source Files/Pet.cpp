@@ -35,7 +35,7 @@ void draw_happy_dog(){
 }
 
 void draw_sad_cat(){
-    cout<<( "  /\\____/\\\n( =- . - =)\n (“) (“) _/\n");
+    cout<<( "  /\\____/\\\n( =- . - =)\n (\") (\") _/\n");
 }
 
 void draw_sad_dog(){
@@ -44,7 +44,7 @@ void draw_sad_dog(){
 }
 
 void draw_dead_cat(){
-    cout<<( "  /\\____/\\\n( =x . x =)\n (“) (“) _/\n");
+    cout<<( "  /\\____/\\\n( =x . x =)\n (\") (\") _/\n");
 }
 
 void draw_dead_dog(){
@@ -57,6 +57,11 @@ void Pet::stop() {
 
 
 void Pet::feed(int amount) {
+
+    if (amount <= 0) {
+        cout << "Invalid amount. Please specify a positive value." << endl;
+        return;
+    }
 
     lock_guard<mutex> lock(petMutex);
     cout << "Fed " << amount << "\n";
@@ -78,6 +83,11 @@ void Pet::feed(int amount) {
 }
 
 void Pet::play() {
+
+    if (tiredness >= 100) {
+        cout << name << " is too tired to play." << endl;
+        return;
+    }
     lock_guard<mutex> lock(petMutex);
     if (alive) {
         happiness += 5 * getExperienceRate();
