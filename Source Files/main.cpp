@@ -1,11 +1,8 @@
-#include <unordered_map>
-#include <string>
 #include "../Header Files/Pet.h"
+#include "../Header Files/SymbolTable.h"
 
-extern void parser_main();
+extern int parser_main(int argc, char **argv);
 
-int main()
-{
-    parser_main();
-    return 0;
+int main(int argc, char **argv) {
+    return parser_main(argc, argv);
 }

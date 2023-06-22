@@ -15,25 +15,28 @@ SymbolTable petMap;
   char* str;
 }
 
-%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM
+%token ADOPT FEED PLAY SLEEP STATUS TEACH PERFORM BURY SAVE LOAD
 %token <str> IDENTIFIER
 
 %%
 
-program: command_list { /* do nothing */ }
+program: command_list {}
         ;
 
-command_list: command ';' command_list { /* do nothing */ }
-            | command ';' { /* do nothing */ }
+command_list: command ';' command_list {}
+            | command ';' {}
             ;
 
-command: adopt { /* do nothing */ }
-       | feed { /* do nothing */ }
-       | play { /* do nothing */ }
-       | sleep { /* do nothing */ }
-       | status { /* do nothing */ }
-       | teach { /* do nothing */ }
-       | perform { /* do nothing */ }
+command: adopt { }
+       | feed { }
+       | play {}
+       | sleep {}
+       | status {}
+       | teach {}
+       | perform {}
+       | save {}
+       | load {}
+       | bury {}
        ;
 
 adopt: ADOPT IDENTIFIER IDENTIFIER {
@@ -106,6 +109,30 @@ perform: PERFORM IDENTIFIER IDENTIFIER {
          delete $2; delete $3;
       }
 
+bury: BURY IDENTIFIER {
+          Pet* pet = petMap.lookup(std::string($2));
+          if (pet == nullptr) {
+              yyerror("Pet does not exist");
+          } else {
+              if(pet->isAlive() == false) {
+                  petMap.bury(std::string($2));
+              } else {
+                  std::cout << "Pet " << std::string($2) << " is still alive. Can't bury it." << std::endl;
+              }
+          }
+          delete $2;
+      }
+
+save: SAVE {
+    petMap.save();
+        }
+
+load: LOAD {
+    petMap.load("pets.txt");
+}
+
+
+
 
 %%
 
@@ -113,6 +140,15 @@ void yyerror(const char *s) {
   fprintf(stderr, "Error: %s\n", s);
 }
 
-void parser_main() {
-  yyparse();
+int parser_main(int argc, char **argv) {
+      if (argc > 1) {
+              FILE *file = fopen(argv[1], "r");
+              if (!file) {
+                  std::cerr << "Error: could not open file " << std::endl;
+                  return 1;
+              }
+              yyin = file;
+      }
+      yyparse();
+      return 0;
 }

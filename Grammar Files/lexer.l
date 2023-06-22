@@ -10,14 +10,17 @@ extern int yylex();
 %option noyywrap
 
 %%
+"save" { return SAVE; }
+"load" { return LOAD; }
 
 "adopt" { return ADOPT; }
 "feed"  { return FEED; }
 "play" { return PLAY; }
 "sleep" { return SLEEP; }
 "status" { return STATUS; }
-"teach" { return TEACH; }  // New command
-"perform" { return PERFORM; }  // New command
+"teach" { return TEACH; }
+"perform" { return PERFORM; }
+"bury" { return BURY; }
 "dog"   { yylval.str = strdup("dog"); return IDENTIFIER; }
 "cat"   { yylval.str = strdup("cat"); return IDENTIFIER; }
 [a-zA-Z][a-zA-Z0-9]* { yylval.str = strdup(yytext); return IDENTIFIER; }
